@@ -2,33 +2,22 @@
 <?php
 require "vendor/autoload.php";
 use PHPHtmlParser\Dom;
+use Playground\Downloader;
 
 echo "Starting script: \n";
+
 $dom = new Dom;
 $url = "http://www.xvideos.com";
-$dom->loadFromUrl($url);
+$directory = "thumbs";
 
+$downloader = new Downloader($dom, $url, $directory);
+$downloader->loadSiteHTML();
 
-$blocks = $dom->find('.thumb-block');
 $directory = "thumbs";
 mkdir($directory);
 
 $time_start = microtime(true);
-
-foreach ($blocks as $block)
-{
-    $link  = $block->find('.thumb-under p a')[0];
-    echo $link->text . "\n";
-
-    $img = $block->find('.thumb-inside img')[0];
-
-    $extension = pathinfo($img->getAttribute('data-src'), PATHINFO_EXTENSION);
-    $file = file_get_contents($img->getAttribute('data-src'));
-    file_put_contents("{$directory}/{$link->text}.{$extension}", $file);
-
-    echo "==================\n";
-}
-
+$downloader->makeDownload();
 
 $time_end = microtime(true);
 $total_time = $time_end - $time_start;
