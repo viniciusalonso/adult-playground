@@ -33,7 +33,7 @@ class Downloader
 
     private function getVideoName(\PHPHtmlParser\Dom\HtmlNode $block) : string
     {
-        $link  = $block->find('.thumb-under p a')[0];
+        $link  = current($block->find('.thumb-under p a'));
         return $link->text;
     }
 
