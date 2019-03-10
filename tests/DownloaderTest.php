@@ -17,37 +17,35 @@ class DownloaderTest extends \PHPUnit\Framework\TestCase
 
         $url = "http://www.example.com";
 
-        $directory = "thumbs";
-
         $domMock->expects($this->once())
             ->method('loadFromUrl')
             ->with($this->equalTo($url));
 
-        $downloader = new Downloader($domMock, $url, $directory);
+        $downloader = new Downloader($domMock, $url);
         $downloader->loadSiteHTML();
     }
 
     /**
      * @test
      **/
-    /* public function makeDownload_when() */
-    /* { */
-    /*     $domMock = $this->createMock(Dom::class); */
-    /*     $domMock->method('loadFromUrl') */
-    /*         ->willReturn($this->getHtmlFaker()); */
+    public function makeDownload_shouldApplyStrategyToDownload()
+    {
+        $domMock = $this->getMockBuilder(Dom::class)
+            ->setMethods(['loadFromUrl'])
+            ->getMock();
 
-    /*     $url = "http://www.example.com"; */
+        $url = "http://www.example.com";
 
-    /*     $directory = "thumbs"; */
+        $domMock->expects($this->once())
+            ->method('loadFromUrl')
+            ->with($this->equalTo($url));
 
-    /*     $downloader = new Downloader($domMock, $url, $directory); */
-    /*     $downloader->loadSiteHTML(); */
-    /*     $downloader->makeDownload(); */
-    /* } */
+        $strategy = $this->prophesize(\Playground\DownloadStrategy::class);
+        $strategy->make($domMock)->shouldBeCalled();
 
-    /* private function getHtmlFaker() */
-    /* { */
-    /*     return file_get_contents(__DIR__ . '/fixtures/block.html'); */
-    /* } */
+        $downloader = new Downloader($domMock, $url);
+        $downloader->loadSiteHTML();
+        $downloader->makeDownload($strategy->reveal());
+    }
 
 }

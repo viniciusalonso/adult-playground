@@ -3,6 +3,7 @@
 require "vendor/autoload.php";
 use PHPHtmlParser\Dom;
 use Playground\Downloader;
+use Playground\DownloadThumbsAtHome;
 
 echo "Starting script: \n";
 
@@ -10,15 +11,13 @@ $dom = new Dom;
 $url = "http://www.xvideos.com";
 $directory = "thumbs";
 
-$downloader = new Downloader($dom, $url, $directory);
+$downloader = new Downloader($dom, $url);
 $downloader->loadSiteHTML();
 
-$directory = "thumbs";
+$downloadStrategy = new DownloadThumbsAtHome($directory);
+
 mkdir($directory);
 
-$time_start = microtime(true);
-$downloader->makeDownload();
+$downloader->makeDownload($downloadStrategy);
 
-$time_end = microtime(true);
-$total_time = $time_end - $time_start;
-echo "Executed in : {$total_time} seconds \n";
+echo "Executed in : {$downloader->getTotalExecutionTime()} seconds \n";
