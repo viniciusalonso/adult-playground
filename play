@@ -5,19 +5,32 @@ use PHPHtmlParser\Dom;
 use Playground\Downloader;
 use Playground\DownloadThumbsAtHome;
 
-echo "Starting script: \n";
+echo "Welcome to Adult Playground\n";
+echo "A script that allow you download content from a funny web site =D\n";
 
-$dom = new Dom;
-$url = "http://www.xvideos.com";
-$directory = "thumbs";
+$actions = [
+    '--download-thumbs' => 'Playground\DownloadThumbsAtHome'
+];
 
-$downloader = new Downloader($dom, $url);
-$downloader->loadSiteHTML();
+$allowed_actions = array_keys($actions);
 
-$downloadStrategy = new DownloadThumbsAtHome($directory);
+if (sizeof($argv) == 1 || !in_array($argv[1], $allowed_actions)) {
+    echo "\nOptions:\n";
+    echo "--download-thumbs          Download all thumbs from homepage\n";
+}
+else {
+    $dom = new Dom;
+    $url = "http://www.xvideos.com";
+    $directory = "thumbs";
 
-mkdir($directory);
+    $downloader = new Downloader($dom, $url);
+    $downloader->loadSiteHTML();
 
-$downloader->makeDownload($downloadStrategy);
+    $downloadStrategy = new $actions[$argv[1]]($directory);
 
-echo "Executed in : {$downloader->getTotalExecutionTime()} seconds \n";
+    mkdir($directory);
+
+    $downloader->makeDownload($downloadStrategy);
+
+    echo "Executed in : {$downloader->getTotalExecutionTime()} seconds \n";
+}
